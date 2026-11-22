@@ -1,0 +1,615 @@
+{
+  "entities": {
+    "ErpStateSnapshot": {
+      "title": "ERP Master State Snapshot",
+      "description": "Master cloud snapshot of [اسم المشروع] state for real-time synchronization across browser profiles and devices without login.",
+      "type": "object",
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "description": "Fixed single-workspace identifier (master).",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "stateJson": {
+          "type": "string",
+          "description": "Serialized JSON of the complete ERP ErpAppState.",
+          "minLength": 2,
+          "maxLength": 950000
+        },
+        "accountsCount": {
+          "type": "integer",
+          "description": "Total number of player accounts."
+        },
+        "villagesCount": {
+          "type": "integer",
+          "description": "Total number of villages."
+        },
+        "totalPP": {
+          "type": "integer",
+          "description": "Total premium points across all accounts."
+        },
+        "deviceTag": {
+          "type": "string",
+          "description": "Identifier of the browser/device instance that wrote the update.",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "clientTimestamp": {
+          "type": "integer",
+          "description": "Client epoch timestamp in ms."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp."
+        }
+      },
+      "required": [
+        "workspaceId",
+        "stateJson",
+        "accountsCount",
+        "villagesCount",
+        "totalPP",
+        "deviceTag",
+        "clientTimestamp",
+        "updatedAt"
+      ]
+    },
+    "UserAccount": {
+      "title": "User Account",
+      "description": "Tribal Wars player account (userAccounts collection; zero default accounts, no PII/password stored in cloud).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "pp": {
+          "type": "integer"
+        },
+        "device": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "browser": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "ip": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "deviceId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "lastSyncTime": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "pp",
+        "device",
+        "browser",
+        "ip",
+        "deviceId",
+        "lastSyncTime",
+        "updatedAt"
+      ]
+    },
+    "Village": {
+      "title": "Village",
+      "description": "Tribal Wars village entity (villages collection) including troop matrix, stocks, bonuses, and buildings.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "villageId": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "accountId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "worldId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "continent": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "coord": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "villagePoints": {
+          "type": "integer"
+        },
+        "flag": {
+          "type": "integer"
+        },
+        "woodItem": {
+          "type": "integer"
+        },
+        "clayItem": {
+          "type": "integer"
+        },
+        "ironItem": {
+          "type": "integer"
+        },
+        "premium": {
+          "type": "boolean"
+        },
+        "boost30": {
+          "type": "boolean"
+        },
+        "marketLevel": {
+          "type": "integer"
+        },
+        "farmLevel": {
+          "type": "integer"
+        },
+        "warehouseLevel": {
+          "type": "integer"
+        },
+        "woodStock": {
+          "type": "integer"
+        },
+        "clayStock": {
+          "type": "integer"
+        },
+        "ironStock": {
+          "type": "integer"
+        },
+        "spearsHome": {
+          "type": "integer"
+        },
+        "swordsHome": {
+          "type": "integer"
+        },
+        "spearsAway": {
+          "type": "integer"
+        },
+        "swordsAway": {
+          "type": "integer"
+        },
+        "spearsTotal": {
+          "type": "integer"
+        },
+        "swordsTotal": {
+          "type": "integer"
+        },
+        "axesTotal": {
+          "type": "integer"
+        },
+        "lightsTotal": {
+          "type": "integer"
+        },
+        "heaviesTotal": {
+          "type": "integer"
+        },
+        "unlockedScavTiers": {
+          "type": "integer"
+        },
+        "scavReturnAt": {
+          "type": "integer"
+        },
+        "scavNextReturnAt": {
+          "type": "integer"
+        },
+        "buildingsJson": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "unitsJson": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "lastSyncTime": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "villageId",
+        "accountId",
+        "worldId",
+        "continent",
+        "name",
+        "coord",
+        "villagePoints",
+        "flag",
+        "woodItem",
+        "clayItem",
+        "ironItem",
+        "premium",
+        "boost30",
+        "marketLevel",
+        "farmLevel",
+        "warehouseLevel",
+        "woodStock",
+        "clayStock",
+        "ironStock",
+        "spearsHome",
+        "swordsHome",
+        "spearsAway",
+        "swordsAway",
+        "spearsTotal",
+        "swordsTotal",
+        "axesTotal",
+        "lightsTotal",
+        "heaviesTotal",
+        "unlockedScavTiers",
+        "scavReturnAt",
+        "scavNextReturnAt",
+        "buildingsJson",
+        "unitsJson",
+        "lastSyncTime",
+        "updatedAt"
+      ]
+    },
+    "VillagePlan": {
+      "title": "Village Plan",
+      "description": "Approved development and scavenging roadmap for a village (villagePlans collection).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "villageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "simType": {
+          "type": "string",
+          "maxLength": 32
+        },
+        "totalSteps": {
+          "type": "integer"
+        },
+        "completedSteps": {
+          "type": "integer"
+        },
+        "progressPct": {
+          "type": "integer"
+        },
+        "stepsJson": {
+          "type": "string",
+          "maxLength": 250000
+        },
+        "assignedAt": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "villageId",
+        "name",
+        "simType",
+        "totalSteps",
+        "completedSteps",
+        "progressPct",
+        "stepsJson",
+        "assignedAt",
+        "updatedAt"
+      ]
+    },
+    "WorldMarket": {
+      "title": "World and Continent Market",
+      "description": "World speed and 4 continents exchange rates (worlds collection).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "speed": {
+          "type": "number"
+        },
+        "continentsJson": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "speed",
+        "continentsJson",
+        "updatedAt"
+      ]
+    },
+    "IncomingVillageSync": {
+      "title": "Incoming Village Sync",
+      "description": "Automatic village sync payload pushed via Firestore REST :commit from the in-game bookmarklet or Tampermonkey userscript.",
+      "type": "object",
+      "properties": {
+        "syncId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "villageId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "worldCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "playerName": {
+          "type": "string",
+          "maxLength": 120
+        },
+        "villageName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "payloadJson": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 250000
+        },
+        "clientTimestamp": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "syncId",
+        "villageId",
+        "worldCode",
+        "playerName",
+        "villageName",
+        "payloadJson",
+        "clientTimestamp",
+        "updatedAt"
+      ]
+    },
+    "ConnectionProbe": {
+      "title": "Firestore Boot Connection Probe",
+      "description": "Read-only connection verification target (/test/connection) invoked on application boot via getDocFromServer.",
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "maxLength": 32
+        }
+      }
+    },
+    "ProProxyBucket": {
+      "title": "PRO Proxy Bucket",
+      "description": "Normalized proxy and browser profile container for PRO_CORE_PROXIES with /24 subnet collision tracking.",
+      "type": "object",
+      "properties": {
+        "proxyId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "endpoint": { "type": "string", "maxLength": 64 },
+        "subnet24": { "type": "string", "maxLength": 32 },
+        "browserProfile": { "type": "string", "maxLength": 120 },
+        "fingerprintHash": { "type": "string", "maxLength": 64 },
+        "healthStatus": { "type": "string", "enum": ["healthy", "warn", "down"] },
+        "assignedCount": { "type": "integer" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["proxyId", "endpoint", "subnet24", "browserProfile", "fingerprintHash", "healthStatus", "assignedCount", "updatedAt"]
+    },
+    "ProAccountRecord": {
+      "title": "PRO Account Record",
+      "description": "Lightweight normalized player account document in PRO_CORE_ACCOUNTS.",
+      "type": "object",
+      "properties": {
+        "accountId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "username": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "worldId": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "proxyId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "ppBalance": { "type": "integer" },
+        "targetDailyPP": { "type": "integer" },
+        "operationalState": { "type": "string", "enum": ["active", "standby", "flagged"] },
+        "lastSyncAt": { "type": "integer" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["accountId", "username", "worldId", "proxyId", "ppBalance", "targetDailyPP", "operationalState", "lastSyncAt", "updatedAt"]
+    },
+    "ProWorldExchange": {
+      "title": "PRO World Exchange",
+      "description": "Shared continent exchange rates, stock, and capacity gate in PRO_CORE_WORLDS_EXCHANGE.",
+      "type": "object",
+      "properties": {
+        "exchangeKey": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "worldId": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "continent": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "exchangeStatus": { "type": "string", "enum": ["open", "partial", "blocked", "closed"] },
+        "ratesJson": { "type": "string", "maxLength": 500 },
+        "stockJson": { "type": "string", "maxLength": 500 },
+        "headroomJson": { "type": "string", "maxLength": 500 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["exchangeKey", "worldId", "continent", "exchangeStatus", "ratesJson", "stockJson", "headroomJson", "updatedAt"]
+    },
+    "ProVillageLive": {
+      "title": "PRO Village Live State",
+      "description": "Hot operational projection for a village in PRO_CORE_VILLAGES_LIVE.",
+      "type": "object",
+      "properties": {
+        "villageId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "accountId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "exchangeKey": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "coord": { "type": "string", "maxLength": 32 },
+        "realizableDailyPP": { "type": "integer" },
+        "sellableNowPP": { "type": "integer" },
+        "urgencyScore": { "type": "integer" },
+        "triageTrack": { "type": "string", "enum": ["now", "deferred", "silent"] },
+        "overflowAt": { "type": "integer" },
+        "scavReturnAt": { "type": "integer" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["villageId", "accountId", "exchangeKey", "name", "coord", "realizableDailyPP", "sellableNowPP", "urgencyScore", "triageTrack", "overflowAt", "scavReturnAt", "updatedAt"]
+    },
+    "ProTimelineEvent": {
+      "title": "PRO Timeline Queue Event",
+      "description": "Unified priority alert in PRO_CORE_TIMELINE_QUEUE.",
+      "type": "object",
+      "properties": {
+        "eventId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "accountId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "villageId": { "type": "string", "maxLength": 128 },
+        "category": { "type": "string", "enum": ["warehouse", "scav", "market", "proxy_collision"] },
+        "severity": { "type": "string", "enum": ["critical", "warn", "info"] },
+        "dueAt": { "type": "integer" },
+        "summary": { "type": "string", "maxLength": 240 },
+        "acknowledged": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["eventId", "accountId", "villageId", "category", "severity", "dueAt", "summary", "acknowledged", "updatedAt"]
+    },
+    "ProPpLedgerEntry": {
+      "title": "PRO PP Ledger Entry",
+      "description": "Cold daily PP and EGP accounting ledger entry in PRO_CORE_PP_LEDGER.",
+      "type": "object",
+      "properties": {
+        "ledgerKey": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "dateKey": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "accountId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "startPP": { "type": "integer" },
+        "currentPP": { "type": "integer" },
+        "earnedNetPP": { "type": "integer" },
+        "egpValue": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ledgerKey", "dateKey", "accountId", "startPP", "currentPP", "earnedNetPP", "egpValue", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/erpStates/{stateId}": {
+      "schema": {
+        "$ref": "#/entities/ErpStateSnapshot"
+      },
+      "description": "Single-workspace master real-time state document synced across devices without login."
+    },
+    "/userAccounts/{accountDocId}": {
+      "schema": {
+        "$ref": "#/entities/UserAccount"
+      },
+      "description": "Collection of Tribal Wars player accounts added manually or via sync (0 default accounts)."
+    },
+    "/villages/{villageDocId}": {
+      "schema": {
+        "$ref": "#/entities/Village"
+      },
+      "description": "Collection of villages with full troop matrix and stock breakdown."
+    },
+    "/villagePlans/{planDocId}": {
+      "schema": {
+        "$ref": "#/entities/VillagePlan"
+      },
+      "description": "Collection of approved village development plans and steps."
+    },
+    "/worlds/{worldDocId}": {
+      "schema": {
+        "$ref": "#/entities/WorldMarket"
+      },
+      "description": "Collection of worlds and continent market rates."
+    },
+    "/incomingVillageSyncs/{syncId}": {
+      "schema": {
+        "$ref": "#/entities/IncomingVillageSync"
+      },
+      "description": "Automatic village sync queue from bookmarklet / Tampermonkey userscript."
+    },
+    "/test/{docId}": {
+      "schema": {
+        "$ref": "#/entities/ConnectionProbe"
+      },
+      "description": "Read-only boot connection check document (/test/connection)."
+    },
+    "/PRO_CORE_PROXIES/{proxyId}": {
+      "schema": { "$ref": "#/entities/ProProxyBucket" },
+      "description": "PRO normalized proxy & browser profile buckets."
+    },
+    "/PRO_CORE_ACCOUNTS/{accountId}": {
+      "schema": { "$ref": "#/entities/ProAccountRecord" },
+      "description": "PRO lightweight player account registry."
+    },
+    "/PRO_CORE_WORLDS_EXCHANGE/{exchangeKey}": {
+      "schema": { "$ref": "#/entities/ProWorldExchange" },
+      "description": "PRO shared continent market exchange state."
+    },
+    "/PRO_CORE_VILLAGES_LIVE/{villageId}": {
+      "schema": { "$ref": "#/entities/ProVillageLive" },
+      "description": "PRO materialized live village operational projection."
+    },
+    "/PRO_CORE_TIMELINE_QUEUE/{eventId}": {
+      "schema": { "$ref": "#/entities/ProTimelineEvent" },
+      "description": "PRO single priority queue stream."
+    },
+    "/PRO_CORE_PP_LEDGER/{ledgerKey}": {
+      "schema": { "$ref": "#/entities/ProPpLedgerEntry" },
+      "description": "PRO daily PP & EGP ledger archive."
+    }
+  }
+}

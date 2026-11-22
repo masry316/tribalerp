@@ -1,0 +1,6 @@
+{
+  "name": "حرب القبائل ERP | المنظومة الميدانية الشاملة",
+  "description": "منظومة إدارة الحسابات والقرى ومحاكي الإغارات الذكي لحرب القبائل مع المزامنة السحابية عبر Firebase Firestore.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

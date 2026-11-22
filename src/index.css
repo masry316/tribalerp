@@ -1,0 +1,258 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "IBM Plex Sans Arabic", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Arial, sans-serif;
+  --font-display: var(--font-sans);
+  --font-mono: "IBM Plex Mono", "IBM Plex Sans Arabic", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+:root {
+  --nx-bg-canvas: #f8f9fb;
+  --nx-bg-surface: #ffffff;
+  --nx-bg-subtle: #f4f5f8;
+  --nx-bg-hover: #f3f4f6;
+  --nx-bg-active: #f1f2f6;
+  --nx-bg-muted: #eceef3;
+  --nx-text-primary: #111827;
+  --nx-text-secondary: #4b5563;
+  --nx-text-muted: #6b7280;
+  --nx-text-subtle: #9ca3af;
+  --nx-border: #eaecef;
+  --nx-border-strong: #d5d9e2;
+  --nx-indigo: #4f46e5;
+  --nx-indigo-soft: #eef2ff;
+  --nx-periwinkle: #7c74f2;
+  --nx-blue: #3b82f6;
+  --nx-cyan: #06b6d4;
+  --nx-teal: #0d9488;
+  --nx-coral: #dc2626;
+  --nx-coral-bg: #fef2f2;
+  --nx-coral-border: #fecaca;
+  --nx-amber: #d97706;
+  --nx-amber-bg: #fffbeb;
+  --nx-amber-border: #fde68a;
+  --nx-emerald: #059669;
+  --nx-emerald-bg: #ecfdf5;
+  --nx-emerald-border: #a7f3d0;
+  --nx-radius-xs: 6px;
+  --nx-radius-sm: 8px;
+  --nx-radius-md: 10px;
+  --nx-radius-xl: 18px;
+  --nx-shadow-card: 0 1px 2px rgba(17, 24, 39, 0.03);
+  --nx-shadow-float: 0 12px 32px rgba(17, 24, 39, 0.12), 0 2px 6px rgba(17, 24, 39, 0.04);
+}
+
+.dark {
+  --nx-bg-canvas: #0b0e14;
+  --nx-bg-surface: #131722;
+  --nx-bg-subtle: #181d2a;
+  --nx-bg-hover: #1e2433;
+  --nx-bg-active: #232a3b;
+  --nx-bg-muted: #242b3d;
+  --nx-text-primary: #f3f4f6;
+  --nx-text-secondary: #cbd5e1;
+  --nx-text-muted: #94a3b8;
+  --nx-text-subtle: #64748b;
+  --nx-border: #23293a;
+  --nx-border-strong: #333c52;
+  --nx-indigo: #6366f1;
+  --nx-indigo-soft: rgba(99, 102, 241, 0.16);
+  --nx-periwinkle: #818cf8;
+  --nx-blue: #60a5fa;
+  --nx-cyan: #22d3ee;
+  --nx-teal: #14b8a6;
+  --nx-coral: #f87171;
+  --nx-coral-bg: rgba(239, 68, 68, 0.14);
+  --nx-coral-border: rgba(248, 113, 113, 0.35);
+  --nx-amber: #fbbf24;
+  --nx-amber-bg: rgba(245, 158, 11, 0.14);
+  --nx-amber-border: rgba(251, 191, 36, 0.32);
+  --nx-emerald: #34d399;
+  --nx-emerald-bg: rgba(16, 185, 129, 0.14);
+  --nx-emerald-border: rgba(52, 211, 153, 0.32);
+  --nx-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --nx-shadow-float: 0 16px 38px rgba(0, 0, 0, 0.55);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+    background-color: var(--nx-bg-canvas);
+    color: var(--nx-text-primary);
+    line-height: 1.55;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 1.35;
+  }
+
+  input,
+  select,
+  textarea {
+    color-scheme: light;
+  }
+
+  .dark input,
+  .dark select,
+  .dark textarea {
+    color-scheme: dark;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  summary:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--nx-indigo);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .nx-transition {
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, opacity 150ms ease, box-shadow 150ms ease;
+  }
+
+  .font-mono-num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .nx-card {
+    background-color: var(--nx-bg-surface);
+    border: 1px solid var(--nx-border);
+    border-radius: var(--nx-radius-md);
+    box-shadow: var(--nx-shadow-card);
+  }
+
+  .nx-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 40px;
+    padding: 0 0.95rem;
+    border-radius: var(--nx-radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, opacity 150ms ease;
+  }
+
+  .nx-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .nx-btn-compact {
+    min-height: 34px;
+    padding: 0 0.75rem;
+    font-size: 12.5px;
+    border-radius: var(--nx-radius-sm);
+  }
+
+  .nx-btn-primary {
+    background-color: var(--nx-indigo);
+    color: #ffffff;
+    border: 1px solid transparent;
+  }
+
+  .nx-btn-primary:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
+
+  .nx-btn-outline {
+    background-color: var(--nx-bg-surface);
+    color: var(--nx-text-primary);
+    border: 1px solid var(--nx-border-strong);
+  }
+
+  .nx-btn-outline:hover:not(:disabled) {
+    background-color: var(--nx-bg-hover);
+  }
+
+  .nx-input,
+  .nx-select {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    height: 40px;
+    padding: 0 0.75rem;
+    border-radius: var(--nx-radius-md);
+    border: 1px solid var(--nx-border-strong);
+    background-color: var(--nx-bg-surface);
+    color: var(--nx-text-primary);
+    font-size: 13px;
+    transition: border-color 150ms ease, background-color 150ms ease;
+  }
+
+  .nx-input-compact,
+  .nx-select-compact {
+    height: 34px;
+    padding: 0 0.65rem;
+    border-radius: var(--nx-radius-sm);
+    font-size: 12.5px;
+  }
+
+  .nx-input:focus,
+  .nx-select:focus {
+    outline: none;
+    border-color: var(--nx-indigo);
+  }
+
+  .nx-delta-pos,
+  .nx-delta-neg {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 7px;
+    border-radius: var(--nx-radius-xs);
+    font-size: 11.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .nx-delta-pos {
+    background-color: var(--nx-emerald-bg);
+    color: var(--nx-emerald);
+  }
+
+  .nx-delta-neg {
+    background-color: var(--nx-coral-bg);
+    color: var(--nx-coral);
+  }
+
+  .nx-skeleton {
+    background-color: var(--nx-bg-muted);
+    border-radius: var(--nx-radius-sm);
+    animation: nx-pulse 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes nx-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}

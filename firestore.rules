@@ -1,0 +1,504 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Hardened Primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 3. Schema Validation Helpers (Synced 1:1 with firebase-blueprint.json)
+    function isValidErpStateSnapshot(data) {
+      return data.keys().hasAll([
+          'workspaceId', 'stateJson', 'accountsCount', 'villagesCount',
+          'totalPP', 'deviceTag', 'clientTimestamp', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'workspaceId', 'stateJson', 'accountsCount', 'villagesCount',
+          'totalPP', 'deviceTag', 'clientTimestamp', 'updatedAt'
+        ])
+        && data.workspaceId is string && data.workspaceId == 'master' && data.workspaceId.size() <= 128 && data.workspaceId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.stateJson is string && data.stateJson.size() >= 2 && data.stateJson.size() <= 950000
+        && data.accountsCount is int && data.accountsCount >= 0 && data.accountsCount <= 500
+        && data.villagesCount is int && data.villagesCount >= 0 && data.villagesCount <= 5000
+        && data.totalPP is int && data.totalPP >= 0 && data.totalPP <= 100000000
+        && data.deviceTag is string && data.deviceTag.size() >= 1 && data.deviceTag.size() <= 120
+        && data.clientTimestamp is int && data.clientTimestamp >= 0
+        && data.updatedAt == request.time;
+    }
+
+    function isValidUserAccount(data) {
+      return data.keys().hasAll([
+          'id', 'name', 'pp', 'device', 'browser', 'ip', 'deviceId', 'lastSyncTime', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'name', 'pp', 'device', 'browser', 'ip', 'deviceId', 'lastSyncTime', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 120
+        && data.pp is int && data.pp >= 0 && data.pp <= 100000000
+        && data.device is string && data.device.size() <= 120
+        && data.browser is string && data.browser.size() <= 120
+        && data.ip is string && data.ip.size() <= 64
+        && data.deviceId is string && data.deviceId.size() <= 128
+        && data.lastSyncTime is int && data.lastSyncTime >= 0
+        && data.updatedAt == request.time;
+    }
+
+    function isValidVillageKeys(data) {
+      return data.keys().hasAll([
+          'id', 'villageId', 'accountId', 'worldId', 'continent', 'name', 'coord',
+          'villagePoints', 'flag', 'woodItem', 'clayItem', 'ironItem', 'premium', 'boost30',
+          'marketLevel', 'farmLevel', 'warehouseLevel', 'woodStock', 'clayStock', 'ironStock',
+          'spearsHome', 'swordsHome', 'spearsAway', 'swordsAway', 'spearsTotal', 'swordsTotal',
+          'axesTotal', 'lightsTotal', 'heaviesTotal',
+          'unlockedScavTiers', 'scavReturnAt', 'scavNextReturnAt', 'buildingsJson', 'unitsJson', 'lastSyncTime', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'villageId', 'accountId', 'worldId', 'continent', 'name', 'coord',
+          'villagePoints', 'flag', 'woodItem', 'clayItem', 'ironItem', 'premium', 'boost30',
+          'marketLevel', 'farmLevel', 'warehouseLevel', 'woodStock', 'clayStock', 'ironStock',
+          'spearsHome', 'swordsHome', 'spearsAway', 'swordsAway', 'spearsTotal', 'swordsTotal',
+          'axesTotal', 'lightsTotal', 'heaviesTotal',
+          'unlockedScavTiers', 'scavReturnAt', 'scavNextReturnAt', 'buildingsJson', 'unitsJson', 'lastSyncTime', 'updatedAt'
+        ]);
+    }
+
+    function isValidVillageMeta(data) {
+      return data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.villageId is string && data.villageId.size() <= 64
+        && data.accountId is string && data.accountId.size() >= 1 && data.accountId.size() <= 128
+        && data.worldId is string && data.worldId.size() >= 1 && data.worldId.size() <= 64
+        && data.continent is string && data.continent.size() >= 1 && data.continent.size() <= 16
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 160
+        && data.coord is string && data.coord.size() <= 32
+        && data.premium is bool && data.boost30 is bool;
+    }
+
+    function isValidVillageEconomy(data) {
+      return data.villagePoints is int && data.villagePoints >= 0 && data.villagePoints <= 50000
+        && data.flag is int && data.flag >= 0 && data.flag <= 100
+        && data.woodItem is int && data.woodItem >= 0 && data.woodItem <= 500
+        && data.clayItem is int && data.clayItem >= 0 && data.clayItem <= 500
+        && data.ironItem is int && data.ironItem >= 0 && data.ironItem <= 500
+        && data.marketLevel is int && data.marketLevel >= 0 && data.marketLevel <= 30
+        && data.farmLevel is int && data.farmLevel >= 0 && data.farmLevel <= 30
+        && data.warehouseLevel is int && data.warehouseLevel >= 0 && data.warehouseLevel <= 30
+        && data.woodStock is int && data.woodStock >= 0 && data.woodStock <= 1000000
+        && data.clayStock is int && data.clayStock >= 0 && data.clayStock <= 1000000
+        && data.ironStock is int && data.ironStock >= 0 && data.ironStock <= 1000000;
+    }
+
+    function isValidVillageTroops(data) {
+      return data.spearsHome is int && data.spearsHome >= 0 && data.spearsHome <= 100000
+        && data.swordsHome is int && data.swordsHome >= 0 && data.swordsHome <= 100000
+        && data.spearsAway is int && data.spearsAway >= 0 && data.spearsAway <= 100000
+        && data.swordsAway is int && data.swordsAway >= 0 && data.swordsAway <= 100000
+        && data.spearsTotal is int && data.spearsTotal >= 0 && data.spearsTotal <= 200000
+        && data.swordsTotal is int && data.swordsTotal >= 0 && data.swordsTotal <= 200000
+        && data.axesTotal is int && data.axesTotal >= 0 && data.axesTotal <= 200000
+        && data.lightsTotal is int && data.lightsTotal >= 0 && data.lightsTotal <= 200000
+        && data.heaviesTotal is int && data.heaviesTotal >= 0 && data.heaviesTotal <= 200000
+        && data.unlockedScavTiers is int && data.unlockedScavTiers >= 0 && data.unlockedScavTiers <= 10
+        && data.scavReturnAt is int && data.scavReturnAt >= 0
+        && data.scavNextReturnAt is int && data.scavNextReturnAt >= 0
+        && data.buildingsJson is string && data.buildingsJson.size() <= 10000
+        && data.unitsJson is string && data.unitsJson.size() <= 10000
+        && data.lastSyncTime is int && data.lastSyncTime >= 0
+        && data.updatedAt == request.time;
+    }
+
+    function isValidVillage(data) {
+      return isValidVillageKeys(data)
+        && isValidVillageMeta(data)
+        && isValidVillageEconomy(data)
+        && isValidVillageTroops(data);
+    }
+
+    function isValidVillagePlan(data) {
+      return data.keys().hasAll([
+          'id', 'villageId', 'name', 'simType', 'totalSteps',
+          'completedSteps', 'progressPct', 'stepsJson', 'assignedAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'villageId', 'name', 'simType', 'totalSteps',
+          'completedSteps', 'progressPct', 'stepsJson', 'assignedAt', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.villageId is string && data.villageId.size() >= 1 && data.villageId.size() <= 128
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 200
+        && data.simType is string && data.simType.size() <= 32
+        && data.totalSteps is int && data.totalSteps >= 0 && data.totalSteps <= 5000
+        && data.completedSteps is int && data.completedSteps >= 0 && data.completedSteps <= 5000
+        && data.progressPct is int && data.progressPct >= 0 && data.progressPct <= 100
+        && data.stepsJson is string && data.stepsJson.size() <= 250000
+        && data.assignedAt is int && data.assignedAt >= 0
+        && data.updatedAt == request.time;
+    }
+
+    function isValidWorldMarket(data) {
+      return data.keys().hasAll([
+          'id', 'name', 'speed', 'continentsJson', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'name', 'speed', 'continentsJson', 'updatedAt'
+        ])
+        && data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 120
+        && (data.speed is int || data.speed is float) && data.speed >= 0 && data.speed <= 100
+        && data.continentsJson is string && data.continentsJson.size() <= 10000
+        && data.updatedAt == request.time;
+    }
+
+    function isValidIncomingVillageSync(data) {
+      return data.keys().hasAll([
+          'syncId', 'villageId', 'worldCode', 'playerName',
+          'villageName', 'payloadJson', 'clientTimestamp', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'syncId', 'villageId', 'worldCode', 'playerName',
+          'villageName', 'payloadJson', 'clientTimestamp', 'updatedAt'
+        ])
+        && data.syncId is string && data.syncId.size() >= 1 && data.syncId.size() <= 128 && data.syncId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.villageId is string && data.villageId.size() >= 1 && data.villageId.size() <= 64
+        && data.worldCode is string && data.worldCode.size() >= 1 && data.worldCode.size() <= 64
+        && data.playerName is string && data.playerName.size() <= 120
+        && data.villageName is string && data.villageName.size() >= 1 && data.villageName.size() <= 160
+        && data.payloadJson is string && data.payloadJson.size() >= 2 && data.payloadJson.size() <= 250000
+        && data.clientTimestamp is int && data.clientTimestamp >= 0
+        && data.updatedAt == request.time;
+    }
+
+    // 4. Master ERP State Collection (/erpStates/{stateId})
+    match /erpStates/{stateId} {
+      allow get: if isValidId(stateId) && stateId == 'master';
+      allow list: if existing().workspaceId == 'master';
+      allow create: if isValidId(stateId)
+        && stateId == 'master'
+        && stateId == incoming().workspaceId
+        && isValidErpStateSnapshot(incoming());
+      allow update: if isValidId(stateId)
+        && stateId == 'master'
+        && isValidErpStateSnapshot(incoming())
+        && incoming().workspaceId == existing().workspaceId
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'stateJson', 'accountsCount', 'villagesCount',
+          'totalPP', 'deviceTag', 'clientTimestamp', 'updatedAt'
+        ]);
+    }
+
+    // 5. User Accounts Collection (/userAccounts/{accountDocId})
+    match /userAccounts/{accountDocId} {
+      allow get: if isValidId(accountDocId);
+      allow list: if existing().pp >= 0;
+      allow create: if isValidId(accountDocId)
+        && accountDocId == incoming().id
+        && isValidUserAccount(incoming());
+      allow update: if isValidId(accountDocId)
+        && isValidUserAccount(incoming())
+        && incoming().id == existing().id
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'pp', 'device', 'browser', 'ip', 'deviceId', 'lastSyncTime', 'updatedAt'
+        ]);
+      allow delete: if isValidId(accountDocId);
+    }
+
+    // 6. Villages Collection (/villages/{villageDocId})
+    match /villages/{villageDocId} {
+      allow get: if isValidId(villageDocId);
+      allow list: if existing().villagePoints >= 0;
+      allow create: if isValidId(villageDocId)
+        && villageDocId == incoming().id
+        && isValidVillage(incoming());
+      allow update: if isValidId(villageDocId)
+        && isValidVillage(incoming())
+        && incoming().id == existing().id
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'villageId', 'accountId', 'worldId', 'continent', 'name', 'coord',
+          'villagePoints', 'flag', 'woodItem', 'clayItem', 'ironItem', 'premium', 'boost30',
+          'marketLevel', 'farmLevel', 'warehouseLevel', 'woodStock', 'clayStock', 'ironStock',
+          'spearsHome', 'swordsHome', 'spearsAway', 'swordsAway', 'spearsTotal', 'swordsTotal',
+          'axesTotal', 'lightsTotal', 'heaviesTotal',
+          'unlockedScavTiers', 'scavReturnAt', 'scavNextReturnAt', 'buildingsJson', 'unitsJson', 'lastSyncTime', 'updatedAt'
+        ]);
+      allow delete: if isValidId(villageDocId);
+    }
+
+    // 7. Village Plans Collection (/villagePlans/{planDocId})
+    match /villagePlans/{planDocId} {
+      allow get: if isValidId(planDocId);
+      allow list: if existing().totalSteps >= 0;
+      allow create: if isValidId(planDocId)
+        && planDocId == incoming().id
+        && isValidVillagePlan(incoming());
+      allow update: if isValidId(planDocId)
+        && isValidVillagePlan(incoming())
+        && incoming().id == existing().id
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'villageId', 'name', 'simType', 'totalSteps', 'completedSteps',
+          'progressPct', 'stepsJson', 'assignedAt', 'updatedAt'
+        ]);
+      allow delete: if isValidId(planDocId);
+    }
+
+    // 8. Worlds & Continent Markets Collection (/worlds/{worldDocId})
+    match /worlds/{worldDocId} {
+      allow get: if isValidId(worldDocId);
+      allow list: if existing().speed >= 0;
+      allow create: if isValidId(worldDocId)
+        && worldDocId == incoming().id
+        && isValidWorldMarket(incoming());
+      allow update: if isValidId(worldDocId)
+        && isValidWorldMarket(incoming())
+        && incoming().id == existing().id
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'speed', 'continentsJson', 'updatedAt'
+        ]);
+      allow delete: if isValidId(worldDocId);
+    }
+
+    // 9. Incoming Village Syncs from Bookmarklet / Tampermonkey (/incomingVillageSyncs/{syncId})
+    match /incomingVillageSyncs/{syncId} {
+      allow get: if isValidId(syncId);
+      allow list: if existing().clientTimestamp >= 0;
+      allow create: if isValidId(syncId)
+        && syncId == incoming().syncId
+        && isValidIncomingVillageSync(incoming());
+      allow update: if isValidId(syncId)
+        && isValidIncomingVillageSync(incoming())
+        && incoming().syncId == existing().syncId
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'villageId', 'worldCode', 'playerName', 'villageName',
+          'payloadJson', 'clientTimestamp', 'updatedAt'
+        ]);
+      allow delete: if isValidId(syncId);
+    }
+
+    // 10. Boot Connection Probe (/test/connection)
+    match /test/{docId} {
+      allow get: if isValidId(docId) && docId == 'connection';
+    }
+
+    // 11. PRO Core Schema Validation Helpers
+    function isValidProProxy(data) {
+      return data.keys().hasAll([
+          'proxyId', 'endpoint', 'subnet24', 'browserProfile', 'fingerprintHash',
+          'healthStatus', 'assignedCount', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'proxyId', 'endpoint', 'subnet24', 'browserProfile', 'fingerprintHash',
+          'healthStatus', 'assignedCount', 'updatedAt'
+        ])
+        && isValidId(data.proxyId)
+        && data.endpoint is string && data.endpoint.size() <= 64
+        && data.subnet24 is string && data.subnet24.size() <= 32
+        && data.browserProfile is string && data.browserProfile.size() <= 120
+        && data.fingerprintHash is string && data.fingerprintHash.size() <= 64
+        && data.healthStatus in ['healthy', 'warn', 'down']
+        && data.assignedCount is int && data.assignedCount >= 0 && data.assignedCount <= 500
+        && data.updatedAt == request.time;
+    }
+
+    function isValidProAccount(data) {
+      return data.keys().hasAll([
+          'accountId', 'username', 'worldId', 'proxyId', 'ppBalance',
+          'targetDailyPP', 'operationalState', 'lastSyncAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'accountId', 'username', 'worldId', 'proxyId', 'ppBalance',
+          'targetDailyPP', 'operationalState', 'lastSyncAt', 'updatedAt'
+        ])
+        && isValidId(data.accountId)
+        && data.username is string && data.username.size() >= 1 && data.username.size() <= 120
+        && data.worldId is string && data.worldId.size() >= 1 && data.worldId.size() <= 64
+        && data.proxyId is string && data.proxyId.size() >= 1 && data.proxyId.size() <= 128
+        && data.ppBalance is int && data.ppBalance >= 0 && data.ppBalance <= 100000000
+        && data.targetDailyPP is int && data.targetDailyPP >= 0 && data.targetDailyPP <= 100000
+        && data.operationalState in ['active', 'standby', 'flagged']
+        && data.lastSyncAt is int && data.lastSyncAt >= 0
+        && data.updatedAt == request.time;
+    }
+
+    function isValidProWorldExchange(data) {
+      return data.keys().hasAll([
+          'exchangeKey', 'worldId', 'continent', 'exchangeStatus',
+          'ratesJson', 'stockJson', 'headroomJson', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'exchangeKey', 'worldId', 'continent', 'exchangeStatus',
+          'ratesJson', 'stockJson', 'headroomJson', 'updatedAt'
+        ])
+        && isValidId(data.exchangeKey)
+        && data.worldId is string && data.worldId.size() >= 1 && data.worldId.size() <= 64
+        && data.continent is string && data.continent.size() >= 1 && data.continent.size() <= 16
+        && data.exchangeStatus in ['open', 'partial', 'blocked', 'closed']
+        && data.ratesJson is string && data.ratesJson.size() <= 500
+        && data.stockJson is string && data.stockJson.size() <= 500
+        && data.headroomJson is string && data.headroomJson.size() <= 500
+        && data.updatedAt == request.time;
+    }
+
+    function isValidProVillageLive(data) {
+      return data.keys().hasAll([
+          'villageId', 'accountId', 'exchangeKey', 'name', 'coord',
+          'realizableDailyPP', 'sellableNowPP', 'urgencyScore', 'triageTrack',
+          'overflowAt', 'scavReturnAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'villageId', 'accountId', 'exchangeKey', 'name', 'coord',
+          'realizableDailyPP', 'sellableNowPP', 'urgencyScore', 'triageTrack',
+          'overflowAt', 'scavReturnAt', 'updatedAt'
+        ])
+        && isValidId(data.villageId)
+        && data.accountId is string && data.accountId.size() >= 1 && data.accountId.size() <= 128
+        && data.exchangeKey is string && data.exchangeKey.size() >= 1 && data.exchangeKey.size() <= 128
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 160
+        && data.coord is string && data.coord.size() <= 32
+        && data.realizableDailyPP is int && data.realizableDailyPP >= 0 && data.realizableDailyPP <= 100000
+        && data.sellableNowPP is int && data.sellableNowPP >= 0 && data.sellableNowPP <= 100000
+        && data.urgencyScore is int && data.urgencyScore >= 0 && data.urgencyScore <= 100
+        && data.triageTrack in ['now', 'deferred', 'silent']
+        && data.overflowAt is int && data.overflowAt >= 0
+        && data.scavReturnAt is int && data.scavReturnAt >= 0
+        && data.updatedAt == request.time;
+    }
+
+    function isValidProTimelineEvent(data) {
+      return data.keys().hasAll([
+          'eventId', 'accountId', 'villageId', 'category',
+          'severity', 'dueAt', 'summary', 'acknowledged', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'eventId', 'accountId', 'villageId', 'category',
+          'severity', 'dueAt', 'summary', 'acknowledged', 'updatedAt'
+        ])
+        && isValidId(data.eventId)
+        && data.accountId is string && data.accountId.size() >= 1 && data.accountId.size() <= 128
+        && data.villageId is string && data.villageId.size() <= 128
+        && data.category in ['warehouse', 'scav', 'market', 'proxy_collision']
+        && data.severity in ['critical', 'warn', 'info']
+        && data.dueAt is int && data.dueAt >= 0
+        && data.summary is string && data.summary.size() <= 240
+        && data.acknowledged is bool
+        && data.updatedAt == request.time;
+    }
+
+    function isValidProPpLedger(data) {
+      return data.keys().hasAll([
+          'ledgerKey', 'dateKey', 'accountId', 'startPP',
+          'currentPP', 'earnedNetPP', 'egpValue', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ledgerKey', 'dateKey', 'accountId', 'startPP',
+          'currentPP', 'earnedNetPP', 'egpValue', 'updatedAt'
+        ])
+        && isValidId(data.ledgerKey)
+        && data.dateKey is string && data.dateKey.size() >= 1 && data.dateKey.size() <= 16
+        && data.accountId is string && data.accountId.size() >= 1 && data.accountId.size() <= 128
+        && data.startPP is int && data.startPP >= 0 && data.startPP <= 100000000
+        && data.currentPP is int && data.currentPP >= 0 && data.currentPP <= 100000000
+        && data.earnedNetPP is int && data.earnedNetPP >= 0 && data.earnedNetPP <= 100000000
+        && (data.egpValue is int || data.egpValue is float) && data.egpValue >= 0
+        && data.updatedAt == request.time;
+    }
+
+    // 12. PRO Core Collections
+    match /PRO_CORE_PROXIES/{proxyId} {
+      allow get: if isValidId(proxyId);
+      allow list: if existing().assignedCount >= 0;
+      allow create: if isValidId(proxyId) && proxyId == incoming().proxyId && isValidProProxy(incoming());
+      allow update: if isValidId(proxyId)
+        && isValidProProxy(incoming())
+        && incoming().proxyId == existing().proxyId
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'endpoint', 'subnet24', 'browserProfile', 'fingerprintHash',
+          'healthStatus', 'assignedCount', 'updatedAt'
+        ]);
+      allow delete: if isValidId(proxyId);
+    }
+
+    match /PRO_CORE_ACCOUNTS/{accountId} {
+      allow get: if isValidId(accountId);
+      allow list: if existing().ppBalance >= 0;
+      allow create: if isValidId(accountId) && accountId == incoming().accountId && isValidProAccount(incoming());
+      allow update: if isValidId(accountId)
+        && isValidProAccount(incoming())
+        && incoming().accountId == existing().accountId
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'username', 'worldId', 'proxyId', 'ppBalance',
+          'targetDailyPP', 'operationalState', 'lastSyncAt', 'updatedAt'
+        ]);
+      allow delete: if isValidId(accountId);
+    }
+
+    match /PRO_CORE_WORLDS_EXCHANGE/{exchangeKey} {
+      allow get: if isValidId(exchangeKey);
+      allow list: if existing().worldId is string;
+      allow create: if isValidId(exchangeKey) && exchangeKey == incoming().exchangeKey && isValidProWorldExchange(incoming());
+      allow update: if isValidId(exchangeKey)
+        && isValidProWorldExchange(incoming())
+        && incoming().exchangeKey == existing().exchangeKey
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'worldId', 'continent', 'exchangeStatus',
+          'ratesJson', 'stockJson', 'headroomJson', 'updatedAt'
+        ]);
+      allow delete: if isValidId(exchangeKey);
+    }
+
+    match /PRO_CORE_VILLAGES_LIVE/{villageId} {
+      allow get: if isValidId(villageId);
+      allow list: if existing().urgencyScore >= 0;
+      allow create: if isValidId(villageId) && villageId == incoming().villageId && isValidProVillageLive(incoming());
+      allow update: if isValidId(villageId)
+        && isValidProVillageLive(incoming())
+        && incoming().villageId == existing().villageId
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'accountId', 'exchangeKey', 'name', 'coord',
+          'realizableDailyPP', 'sellableNowPP', 'urgencyScore', 'triageTrack',
+          'overflowAt', 'scavReturnAt', 'updatedAt'
+        ]);
+      allow delete: if isValidId(villageId);
+    }
+
+    match /PRO_CORE_TIMELINE_QUEUE/{eventId} {
+      allow get: if isValidId(eventId);
+      allow list: if existing().dueAt >= 0;
+      allow create: if isValidId(eventId) && eventId == incoming().eventId && isValidProTimelineEvent(incoming());
+      allow update: if isValidId(eventId)
+        && isValidProTimelineEvent(incoming())
+        && incoming().eventId == existing().eventId
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'accountId', 'villageId', 'category',
+          'severity', 'dueAt', 'summary', 'acknowledged', 'updatedAt'
+        ]);
+      allow delete: if isValidId(eventId);
+    }
+
+    match /PRO_CORE_PP_LEDGER/{ledgerKey} {
+      allow get: if isValidId(ledgerKey);
+      allow list: if existing().currentPP >= 0;
+      allow create: if isValidId(ledgerKey) && ledgerKey == incoming().ledgerKey && isValidProPpLedger(incoming());
+      allow update: if isValidId(ledgerKey)
+        && isValidProPpLedger(incoming())
+        && incoming().ledgerKey == existing().ledgerKey
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'dateKey', 'accountId', 'startPP',
+          'currentPP', 'earnedNetPP', 'egpValue', 'updatedAt'
+        ]);
+      allow delete: if isValidId(ledgerKey);
+    }
+  }
+}
